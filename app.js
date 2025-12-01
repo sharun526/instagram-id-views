@@ -204,15 +204,16 @@ document.addEventListener("DOMContentLoaded", () => {
   // wire Admin button with password prompt
   const openBtn = $("openAdmin");
   if(openBtn) {
-    openBtn.addEventListener("click", () => {
+   openBtn.addEventListener("click", () => {
   const user = prompt("Admin Username:");
-  if(user !== ADMIN_USER) return alert("Access Denied");
-  const p = prompt("Admin Password:");
-  if(p !== ADMIN_PASSWORD) return alert("Access Denied");
+  if (user !== ADMIN_USER) return alert("Access Denied");
 
-      const p = prompt("Enter Admin Password");
-      if(p !== ADMIN_PASSWORD) return alert("Access Denied");
-      showAdminPanel();
+  const pass = prompt("Admin Password:");
+  if (pass !== ADMIN_PASSWORD) return alert("Access Denied");
+
+  showAdminPanel(); // 
+});
+
     });
   }
 
