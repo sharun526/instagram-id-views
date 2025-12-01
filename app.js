@@ -47,7 +47,7 @@ function hideAdminPanel() {
 
 // --- Rendering ---
 // --- Backend integration (Render) ---
-const BACKEND_BASE = window.BACKEND_BASE || ''; // set to your site root or full URL in production
+const BACKEND_BASE = 'https://instagram-id-views.onrender.com';
 
 async function fetchIdsFromBackend() {
   try {
