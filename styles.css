@@ -1,0 +1,22 @@
+/* Extra styles for animations */
+.card {
+  perspective: 1000px;
+}
+.card-inner {
+  transform-style: preserve-3d;
+  transition: transform 600ms cubic-bezier(.2,.9,.3,1);
+}
+.card:hover .card-inner {
+  transform: rotateY(12deg) translateY(-6px);
+}
+.card-face {
+  backface-visibility: hidden;
+  transform-origin: center;
+}
+.fade-in {
+  animation: fadeInUp 500ms both;
+}
+@keyframes fadeInUp {
+  from { transform: translateY(12px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}

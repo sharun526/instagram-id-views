@@ -1,0 +1,179 @@
+// Client-side JS for live list, admin panel, animated cards, and local persistence.
+
+const sampleProfiles = [
+  {id: "travel_with_amy", name: "Amy Travel", img: "images/user1.svg"},
+  {id: "foodie_max", name: "Max Food", img: "images/user2.svg"},
+  {id: "design_by_lee", name: "Lee Design", img: "images/user3.svg"},
+];
+
+const STORAGE_KEY = "insta_list_v1";
+
+function getList() {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || sampleProfiles;
+  } catch(e) {
+    return sampleProfiles;
+  }
+}
+
+function saveList(list) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+  dispatchLiveUpdate();
+}
+
+function dispatchLiveUpdate() {
+  // Simple custom event to allow other parts to listen
+  window.dispatchEvent(new CustomEvent('instaListUpdated'));
+}
+
+function renderCards() {
+  const cards = document.getElementById('cards');
+  const list = getList();
+  cards.innerHTML = '';
+  list.forEach((item, idx) => {
+    const el = document.createElement('div');
+    el.className = 'card fade-in bg-white rounded-2xl p-4 shadow hover:shadow-2xl transition';
+    el.style.animationDelay = (idx * 60) + 'ms';
+    el.innerHTML = `
+      <div class="flex items-center gap-4">
+        <img src="${item.img}" alt="${item.id}" class="w-16 h-16 rounded-full border p-1"/>
+        <div class="flex-1">
+          <div class="font-semibold text-lg">${item.name || item.id}</div>
+          <a href="https://instagram.com/${item.id}" target="_blank" rel="noreferrer" class="text-indigo-600 text-sm">@${item.id}</a>
+        </div>
+        <div>
+          <button class="removeBtn text-sm text-red-500 hover:underline" data-id="${item.id}">Remove</button>
+        </div>
+      </div>
+      <div class="mt-3 text-sm text-gray-500">Live status: <span class="status-${item.id}">Active</span></div>
+    `;
+    cards.appendChild(el);
+  });
+
+  // attach remove handlers
+  document.querySelectorAll('.removeBtn').forEach(btn => {
+    btn.onclick = () => {
+      const id = btn.dataset.id;
+      removeId(id);
+    };
+  });
+}
+
+function addId(obj) {
+  const list = getList();
+  // prevent dupes
+  if (list.find(x => x.id.toLowerCase() === obj.id.toLowerCase())) {
+    alert('ID already exists.');
+    return;
+  }
+  list.unshift(obj);
+  saveList(list);
+  renderCards();
+}
+
+function removeId(id) {
+  let list = getList();
+  list = list.filter(x => x.id !== id);
+  saveList(list);
+  renderCards();
+}
+
+function openAdmin() {
+  document.getElementById('adminModal').classList.remove('hidden');
+  document.getElementById('adminModal').classList.add('flex');
+  renderCurrentList();
+}
+function closeAdmin() {
+  document.getElementById('adminModal').classList.remove('flex');
+  document.getElementById('adminModal').classList.add('hidden');
+}
+
+function renderCurrentList() {
+  const ul = document.getElementById('currentList');
+  ul.innerHTML = '';
+  const list = getList();
+  list.forEach(item => {
+    const li = document.createElement('li');
+    li.className = 'flex items-center justify-between bg-gray-50 p-2 rounded';
+    li.innerHTML = `<div><strong>@${item.id}</strong> — ${item.name || '<no name>'}</div>
+      <div class="flex gap-2">
+        <button class="px-2 py-1 text-sm bg-red-100 text-red-700 rounded removeListBtn" data-id="${item.id}">Remove</button>
+      </div>`;
+    ul.appendChild(li);
+  });
+  document.querySelectorAll('.removeListBtn').forEach(b => {
+    b.onclick = () => {
+      removeId(b.dataset.id);
+      renderCurrentList();
+    };
+  });
+}
+
+// Admin form
+document.addEventListener('DOMContentLoaded', () => {
+  renderCards();
+
+  document.getElementById('openAdmin').onclick = openAdmin;
+  document.getElementById('closeAdmin').onclick = closeAdmin;
+  document.getElementById('adminModal').onclick = (e) => {
+    if (e.target.id === 'adminModal') closeAdmin();
+  };
+
+  document.getElementById('addForm').onsubmit = (e) => {
+    e.preventDefault();
+    const id = document.getElementById('igId').value.trim();
+    const name = document.getElementById('displayName').value.trim();
+    if (!id) return;
+    const obj = {id, name, img: profileFor(id)};
+    addId(obj);
+    document.getElementById('igId').value = '';
+    document.getElementById('displayName').value = '';
+    renderCurrentList();
+  };
+
+  document.getElementById('addRandom').onclick = () => {
+    const r = Math.floor(Math.random()*1000);
+    const id = 'user_' + r;
+    addId({id, name: 'Random '+r, img: profileFor(id)});
+    renderCurrentList();
+  };
+
+  // live update demo: change statuses randomly
+  window.addEventListener('instaListUpdated', () => {
+    // small visual pulse on update
+    const hdr = document.querySelector('header');
+    hdr.animate([{transform:'scale(1)'},{transform:'scale(1.01)'},{transform:'scale(1)'}], {duration:350});
+  });
+
+  // periodically update statuses to show live updates (simulated)
+  setInterval(() => {
+    const list = getList();
+    if (!list.length) return;
+    const idx = Math.floor(Math.random()*list.length);
+    const id = list[idx].id;
+    const el = document.querySelector('.status-' + cssSafe(id));
+    if (el) {
+      el.textContent = Math.random() > 0.5 ? 'Active' : 'Idle';
+      el.animate([{opacity:0.4},{opacity:1}], {duration:400});
+    }
+  }, 3200);
+});
+
+function cssSafe(s) {
+  return s.replace(/[^a-zA-Z0-9_-]/g,'_');
+}
+
+function profileFor(id) {
+  // generate deterministic avatar filename based on id:
+  const n = Math.abs(hashCode(id)) % 6 + 1;
+  return `images/user${n}.svg`;
+}
+
+function hashCode(str) {
+  var h = 0;
+  for (var i = 0; i < str.length; i++) {
+    h = ((h<<5)-h)+str.charCodeAt(i);
+    h |= 0;
+  }
+  return h;
+}

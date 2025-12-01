@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Updated Instagram List — Demo</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="styles.css" />
+
+  <!-- Firebase SDKs: replace firebaseConfig in app.js with your project's config -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <!-- End Firebase SDKs -->
+
+</head>
+
+<!-- Admin credentials changed to username 'sharun' and password 'adminlgsharun123'.
+     Login will prompt for username and then password.
+     Note: Unofficial Instagram fetching may be blocked by browser CORS. If profile images do not appear,
+     consider using a server-side proxy or Instagram Graph API for reliable results. -->
+
+<body class="bg-gradient-to-br from-white to-gray-100 min-h-screen">
+  <div class="max-w-6xl mx-auto p-6">
+    <header class="flex items-center justify-between mb-6">
+      <h1 class="text-3xl font-extrabold">Instagram IDs — Live List</h1>
+      <div>
+        <button id="openAdmin" class="px-4 py-2 bg-indigo-600 text-white rounded shadow hover:bg-indigo-500 transition">Admin Panel</button>
+      </div>
+    </header>
+
+    <section>
+      <div id="cards" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6"></div>
+    </section>
+
+    <footer class="mt-8 text-sm text-gray-600">
+      Live updates, animated cards, and admin panel demo.
+    </footer>
+  </div>
+
+  <!-- Admin Modal -->
+  <div id="adminModal" class="fixed inset-0 bg-black/40 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-xl shadow-2xl max-w-xl w-full p-6 transform transition-all duration-300 scale-95" id="adminPanel">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-semibold">Admin — Manage Instagram IDs</h2>
+        <button id="closeAdmin" class="text-gray-500 hover:text-gray-800">Close</button>
+      </div>
+
+      <form id="addForm" class="space-y-3">
+        <div>
+          <label class="block text-sm font-medium">Instagram ID</label>
+          <input id="igId" class="mt-1 block w-full border rounded px-3 py-2" placeholder="e.g. travel_with_amy" required />
+        </div>
+        <div>
+          <label class="block text-sm font-medium">Display name (optional)</label>
+          <input id="displayName" class="mt-1 block w-full border rounded px-3 py-2" placeholder="Amy Travel" />
+        </div>
+        <div class="flex gap-2">
+          <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-500 transition">Add</button>
+          <button type="button" id="addRandom" class="px-4 py-2 bg-gray-200 rounded">Add Random</button>
+        </div>
+      </form>
+
+      <hr class="my-4" />
+
+      <div>
+        <h3 class="font-medium mb-2">Current IDs</h3>
+        <ul id="currentList" class="space-y-2 max-h-48 overflow-auto"></ul>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+
+<!-- Firebase setup note: create a firebaseConfig object and attach it to window
+     Example (replace values with your project's config):
+     <script>
+       window.firebaseConfig = {
+         apiKey: "REPLACE_ME",
+         authDomain: "REPLACE_ME",
+         projectId: "REPLACE_ME",
+         storageBucket: "REPLACE_ME",
+         messagingSenderId: "REPLACE_ME",
+         appId: "REPLACE_ME"
+       };
+     </script>
+-->
+
+</body>
+</html>
